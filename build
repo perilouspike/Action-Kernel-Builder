@@ -2,54 +2,53 @@
 
 set -e -x
 
-WORK="${HOME}/work"
-KERNEL_SRC="${WORK}/kernel-msm"
-CLANG_TAR_URL="https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/android11-release/clang-r383902.tar.gz"
+# Kernel Source
+KERNEL_SOURCE=https://github.com/nashc-dev/android_kernel_realme_mt6785
+KERNEL_BRANCH=lineage-20
+KERNEL_DEFCONFIG=lineage-nashc_defconfig
 
-BINUTILS_GIT="https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9" 
+# Prebuilt Clang Toolchain (AOSP)
+CLANG_URL=https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/android12L-release/clang-r416183b.tar.gz
 
-BINUTILS_32_GIT="https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9"
+# Prebuilt GCC Utilities (AOSP)
+GCC_x64=https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9
+GCC_x32=https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9
+GCC_BRANCH=android12L-release
 
-KERNEL_SOURCE_URL="https://github.com/thecatvoid/android_kernel_motorola_guamp"
+# Setup make Command
+make_fun() {
+  make O=out ARCH=arm64 \
+       CC=clang HOSTCC=clang LLVM=1 \
+       CLANG_TRIPLE=aarch64-linux-gnu- \
+       CROSS_COMPILE=aarch64-linux-androidkernel- \
+       CROSS_COMPILE_ARM32=arm-linux-androidkernel- "$@"
+}
 
-ANYKERNEL_GIT="https://github.com/thecatvoid/AnyKernel3.git"
+# Work Path
+WORK=${HOME}/work
 
+# Kernel Folder Name
+KERNEL=android-kernel
+
+# Kernel Source Path
+KERNEL_SRC=${WORK}/${KERNEL}
+
+# Prepare Directory
 mkdir -p "${WORK}"
 cd "${WORK}" || exit 1
 
-# Setup stuff
-if [ ! -d clang ]; then mkdir clang && curl -Lsq "${CLANG_TAR_URL}" -o clang.tgz && tar -xzf clang.tgz -C clang; fi
-[ ! -d binutils ] && git clone --depth=1 "${BINUTILS_GIT}" -b android11-release binutils
-[ ! -d binutils-32 ] && git clone --depth=1 "${BINUTILS_32_GIT}" -b android11-release binutils-32
-[ ! -d kernel-msm ] && git clone --depth=1 "${KERNEL_SOURCE_URL}" kernel-msm
+# Cloning all the Necessary files
+if [ ! -d clang ]; then mkdir clang && curl -Lsq "${CLANG_URL}" -o clang.tgz && tar -xzf clang.tgz -C clang; fi
+[ ! -d x64 ] && git clone --depth=1 "${GCC_x64}" -b "${GCC_BRANCH}" ./x64
+[ ! -d x32 ] && git clone --depth=1 "${GCC_x32}" -b "${GCC_BRANCH}" ./x32
+[ ! -d "${KERNEL}" ] && git clone --depth=1 "${KERNEL_SOURCE}" -b "${KERNEL_BRANCH}" "${KERNEL}"
 
-# Set toolchain path
-PATH="${WORK}/clang/bin:${WORK}/binutils/bin:${WORK}/binutils-32/bin:/bin"
+# Setting Toolchain Path
+PATH="${WORK}/clang/bin:${WORK}/x64/bin:${WORK}/x32/bin:/bin"
 
-# Build kernel
+# Enter Kernel root directory
 cd "${KERNEL_SRC}" || exit 1
 
-# Android cross compile make function
-make_fun() {
-	make O=out ARCH=arm64 \
-		CC=clang HOSTCC=clang \
-		CLANG_TRIPLE=aarch64-linux-gnu- \
-		CROSS_COMPILE=aarch64-linux-android- \
-		CROSS_COMPILE_ARM32=arm-linux-androideabi- "$@" 
-}
-
-# Make defconfig
-make_fun vendor/guamp_defconfig
-
-# Make kernel
-make_fun -j"$(nproc --all)" || make_fun -j1
-
-# Upload built kernel
-cd "${WORK}" || exit
-[ ! -d ANY ] && git clone --depth=1 "${ANYKERNEL_GIT}" ANY
-cd ANY || exit 1
-rm -rf ./*Image* ./*.zip
-cp "${KERNEL_SRC}/out/arch/arm64/boot/Image.gz-dtb" ./
-dates="$(date +%F+%T%z)"
-zip -r9 "${dates}.zip" ./* -x .git README.md ./*placeholder
-curl -T "${dates}.zip" temp.sh
+# Start Compiling Kernel
+make_fun "${KERNEL_DEFCONFIG}"
+make_fun -j"$(nproc --all)" 2>&1 | tee build.log 
