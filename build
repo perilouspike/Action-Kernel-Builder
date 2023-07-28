@@ -3,9 +3,9 @@
 set -e -x
 
 # Kernel Source
-KERNEL_SOURCE=https://github.com/nashc-dev/android_kernel_realme_mt6785
-KERNEL_BRANCH=lineage-20
-KERNEL_DEFCONFIG=lineage-nashc_defconfig
+KERNEL_SOURCE=https://github.com/cd-Crypton/android_kernel_realme_bengal
+KERNEL_BRANCH=main-staging
+KERNEL_DEFCONFIG=vendor/bengal-perf_defconfig
 
 # Prebuilt Clang Toolchain (AOSP)
 CLANG_URL=https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/android12L-release/clang-r416183b1.tar.gz
@@ -17,11 +17,9 @@ GCC_BRANCH=android12L-release
 
 # Setup make Command
 make_fun() {
-  make O=out ARCH=arm64 \
-       CC=clang HOSTCC=clang LLVM=1 \
-       CLANG_TRIPLE=aarch64-linux-gnu- \
-       CROSS_COMPILE=aarch64-linux-androidkernel- \
-       CROSS_COMPILE_ARM32=arm-linux-androidkernel- "$@"
+  make O=out ARCH=arm64 LVM=1 \
+       CROSS_COMPILE=aarch64-linux-gnu- \
+       CROSS_COMPILE_COMPAT=arm-linux-gnueabi- "$@"
 }
 
 # Work Path
