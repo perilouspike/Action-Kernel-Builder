@@ -8,12 +8,12 @@ KERNEL_BRANCH=stock
 KERNEL_DEFCONFIG=vendor/bengal-perf_defconfig
 
 # Prebuilt Clang Toolchain (AOSP)
-CLANG_URL=https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/452f7dd637a364ffcab548d6c09164d91d23cbbd/clang-r399163b.tar.gz
+CLANG_URL=https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/android12L-release/clang-r416183b.tar.gz
 
 # Prebuilt GCC Utilities (AOSP)
 GCC_x64=https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9
 GCC_x32=https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/arm/arm-linux-androideabi-4.9
-GCC_BRANCH=android11-release
+GCC_BRANCH=android12L-release
 
 # Setup make Command
 make_fun() {
