@@ -20,8 +20,8 @@ make_fun() {
   make O=out ARCH=arm64 \
        CC=clang HOSTCC=clang \
        CLANG_TRIPLE=aarch64-linux-gnu- \
-       CROSS_COMPILE=aarch64-linux-gnu- \
-       CROSS_COMPILE_ARM32=arm-linux-gnueabi- "$@"
+       CROSS_COMPILE=aarch64-linux-androidkernel- \
+       CROSS_COMPILE_COMPAT=arm-linux-androidkernel- "$@"
 }
 
 # Work Path
