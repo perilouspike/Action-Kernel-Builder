@@ -40,13 +40,13 @@ jobs:
     - name: Check Out Directory
       run: |
        cd ~/work
-       if [ -f android-kernel/out/arch/arm64/boot/Image.gz]; then
+       if [ -f android-kernel/out/arch/arm64/boot/Image.gz ]; then
            echo "CHECK_FILE_IS_OK=true" >> $GITHUB_ENV
        else
            echo "Kernel output file is empty"
            exit 1
        fi
-       if [ -f android-kernel/out/arch/arm64/boot/Image]; then
+       if [ -f android-kernel/out/arch/arm64/boot/Image ]; then
            echo "CHECK_FILE_IS_OK=true" >> $GITHUB_ENV
        else
            echo "Kernel output file is empty"
@@ -58,7 +58,7 @@ jobs:
       uses: ncipollo/release-action@v1.12.0
       with:
         artifacts: |
-          /home/runner/work/${{ env.KERNEL }}/out/arch/arm64/boot/Image.*
+          /home/runner/work/${{ env.KERNEL }}/out/arch/arm64/boot/Image*
           /home/runner/work/${{ env.KERNEL }}/build.log
         name: Compiled Kernel // ${{ steps.props.outputs.date }}
         draft: false
