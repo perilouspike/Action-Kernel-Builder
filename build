@@ -4,7 +4,7 @@ set -e -x
 
 # Kernel Source
 KERNEL_SOURCE=https://github.com/cd-Crypton/android_kernel_realme_bengal
-KERNEL_BRANCH=stock
+KERNEL_BRANCH=bengal-4.19
 KERNEL_DEFCONFIG=vendor/bengal-perf_defconfig
 
 # Prebuilt Clang Toolchain (AOSP)
@@ -48,6 +48,10 @@ PATH="${WORK}/clang/bin:${WORK}/x64/bin:${WORK}/x32/bin:/bin"
 
 # Enter Kernel root directory
 cd "${KERNEL_SRC}" || exit 1
+
+# Export Additional Information, change it all according to your wants.
+export KBUILD_BUILD_HOST="${KERNEL}"
+export KBUILD_BUILD_USER="cd-Crypton"
 
 # Start Compiling Kernel
 make_fun "${KERNEL_DEFCONFIG}"
